@@ -1,0 +1,6 @@
+sqlalchemy
+flask-sqlalchemy
+flask
+python-dotenv
+flask_restful
+pymysql
