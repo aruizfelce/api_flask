@@ -17,7 +17,7 @@ db.init_app(app)
 api = Api(app)
 api.add_resource(StoreResourceAll, "/stores")
 api.add_resource(StoreResource, "/stores/<int:store_id>")
-# api.add_resource(StoreResource, "/stores", "method=['POST']")
+
 
 @app.route('/', methods=['GET'])
 def index():
