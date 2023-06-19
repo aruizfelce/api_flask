@@ -4,7 +4,7 @@ from flask_restful import Api
 from db import db
 
 import models
-from resources.store import StoreResource
+from resources.store import StoreResource, StoreResourceAll
 
 
 
@@ -15,7 +15,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 api = Api(app)
-api.add_resource(StoreResource, "/stores")
+api.add_resource(StoreResourceAll, "/stores")
+api.add_resource(StoreResource, "/stores/<int:store_id>")
 # api.add_resource(StoreResource, "/stores", "method=['POST']")
 
 @app.route('/', methods=['GET'])
