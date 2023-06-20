@@ -20,6 +20,15 @@ class StoreResource(Resource):
         db.session.add(store)
         db.session.commit()
         return {"message": "Store {} actualizado satisfactoriamente".format(store.id)}, 201
+    
+    def delete(self, store_id):
+        store = abort_if_store_doesnt_exist(store_id,False)
+        try:
+            db.session.delete(store)
+            db.session.commit()
+        except:
+            return {"message": "No se pudo eliminar la tienda"}, 500
+        return {"message": "Store {} eliminado satisfactoriamente".format(store_id)}, 201
 
 class StoreResourceAll(Resource):
     def get(self):
