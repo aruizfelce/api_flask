@@ -2,6 +2,7 @@ from flask import request, jsonify
 from flask_restful import Resource, abort
 from models.store import StoreModel
 from db import db
+from tools.tools import Tools
 
 class StoreResource(Resource):
     def get(self, store_id):
@@ -30,12 +31,12 @@ class StoreResource(Resource):
             return {"message": "No se pudo eliminar la tienda"}, 500
         return {"message": "Store {} eliminado satisfactoriamente".format(store_id)}, 201
 
-class StoreResourceAll(Resource):
+class StoreAllResource(Resource):
     def get(self):
         stores = StoreModel.query.all()
         if stores:
-            return [store_to_json(store) for store in stores], 200
-            #return {"stores": [store_to_json(store) for store in store]}, 200
+            return [Tools.convertir_json_sql(store) for store in stores], 200
+            #return {"stores": [Tools.convertir_json_sql(store) for store in store]}, 200
         return {"mensaje": "No se encontraron tiendas"}, 404
     
     def post(self):
@@ -51,18 +52,11 @@ class StoreResourceAll(Resource):
         db.session.commit()
         return {"message": "Store creada satisfactoriamente"}, 201
     
-def store_to_json(store):
-    return {
-        "id": store.id,
-        "name": store.name
-    }
-
 def abort_if_store_doesnt_exist(store_id, json=True):
     store = StoreModel.query.get(store_id)
     if store is None:
         abort(404, message="Tienda con el id {} no existe".format(store_id))
     if json:
-        return store_to_json(store), 200
+        return Tools.convertir_json_sql(store), 200
     return store
-    #return {"store": store_to_json(store)}, 200
-    
+    #return {"store": Tools.convertir_json_sql(store)}, 200
