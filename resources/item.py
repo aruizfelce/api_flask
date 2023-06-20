@@ -1,14 +1,13 @@
-from flask import request, jsonify
-from flask_restful import Resource, abort
+from flask import request
+from flask_restful import Resource
 from models.items import ItemModel
 from db import db
 from resources.store import StoreResource
-from datetime import datetime,date
 from tools.tools import Tools
 
 class ItemResource(Resource):
     def get(self, item_id):
-        return abort_if_item_doesnt_exist(item_id)
+        return Tools.abort_if_doesnt_exist(ItemModel,item_id)
     
     def put(self, item_id):
         if not request.get_json():
@@ -20,7 +19,7 @@ class ItemResource(Resource):
         if not request.get_json().get("price"):
             return {"message": "Debe suministrar el precio"}, 400
         
-        item = abort_if_item_doesnt_exist(item_id,False)
+        item = Tools.abort_if_doesnt_exist(ItemModel,item_id,False)
 
         item.name = request.get_json().get("name")
         item.price = request.get_json().get("price")
@@ -30,7 +29,7 @@ class ItemResource(Resource):
         return {"message": "Item {} actualizado satisfactoriamente".format(item.id)}, 201
     
     def delete(self, item_id):
-        item = abort_if_item_doesnt_exist(item_id,False)
+        item = Tools.abort_if_doesnt_exist(ItemModel,item_id,False)
         try:
             db.session.delete(item)
             db.session.commit()
@@ -79,12 +78,3 @@ class ItemByStoreResource(Resource):
             return [Tools.convertir_json_sql(item) for item in items], 200
             #return {"items": [Tools.convertir_json_sql(item) for item in items]}, 200
         return {"mensaje": "No se encontraron items"}, 404
-    
-def abort_if_item_doesnt_exist(item_id, json=True):
-    item = ItemModel.query.get(item_id)
-    if item is None:
-        abort(404, message="Item con el id {} no existe".format(item_id))
-    if json:
-        return Tools.convertir_json_sql(item)
-    return item
-
