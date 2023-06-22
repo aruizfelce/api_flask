@@ -4,7 +4,7 @@ from models import UserModel
 from db import db
 from tools.tools import Tools
 from passlib.hash import pbkdf2_sha256
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required
 
 class UserResource(Resource):
     def post(self):
@@ -43,7 +43,15 @@ class LoginResource(Resource):
         user = UserModel.find_by_username(request.get_json().get("username"))
         
         if user and pbkdf2_sha256.verify(request.get_json().get("password"), user.password):
-            access_token = create_access_token(identity=user.id)
-            return {"access_token": access_token}, 200
+            access_token = create_access_token(identity=user.id, fresh=True)
+            refresh_token = create_refresh_token(user.id)
+            return {"access_token": access_token, "refresh_token": refresh_token}, 200
         
         return {"message": "Credenciales inválidas"}, 401
+
+class TokenRefresh(Resource):
+    @jwt_required(refresh=True)
+    def post(self):
+        current_user = get_jwt_identity()
+        new_token = create_access_token(identity=current_user, fresh=False)
+        return {"access_token": new_token}, 200
