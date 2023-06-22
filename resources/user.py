@@ -17,11 +17,15 @@ class UserResource(Resource):
         if not request.get_json().get("password"):
             return {"message": "Debe suministrar el password"}, 400
         
+        if not request.get_json().get("rol"):
+            return {"message": "Debe suministrar el rol"}, 400
+        
         if UserModel.find_by_username(request.get_json().get("username")):
             return {"message": "Ya existe un usuario con ese username"}, 400
         
         new_user = UserModel(
             username=request.get_json().get("username"),
+            rol=request.get_json().get("rol"),
             password=pbkdf2_sha256.hash(request.get_json().get("password")),
         )
 

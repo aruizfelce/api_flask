@@ -2,7 +2,7 @@ from flask import Flask, jsonify
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
 from db import db
-
+from flask_migrate import Migrate
 import models
 from resources.store import StoreResource, StoreAllResource
 from resources.item import ItemResource, ItemAllResource, ItemByStoreResource
@@ -16,6 +16,8 @@ app.config["JWT_SECRET_KEY"] = "super-secret"
 
 db.init_app(app)
 api = Api(app)
+migrate = Migrate(app, db)
+
 api.add_resource(StoreAllResource, "/stores")
 api.add_resource(StoreResource, "/stores/<int:store_id>")
 
@@ -73,8 +75,8 @@ def token_not_fresh_callback(jwt_header, jwt_payload):
 def index():
     return jsonify({'message': 'Welcome to my API'})
 
-with app.app_context():
-    db.create_all()
+""" with app.app_context():
+    db.create_all() """
 
 if __name__ == "__main__":
     app.run(debug=True)
