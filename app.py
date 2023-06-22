@@ -6,6 +6,7 @@ from db import db
 import models
 from resources.store import StoreResource, StoreAllResource
 from resources.item import ItemResource, ItemAllResource, ItemByStoreResource
+from resources.user import UserResource, LoginResource
 
 
 app = Flask(__name__)
@@ -23,7 +24,38 @@ api.add_resource(ItemResource, "/items/<int:item_id>")
 api.add_resource(ItemAllResource, "/items")
 api.add_resource(ItemByStoreResource, "/items/store/<int:store_id>")
 
+api.add_resource(UserResource, "/users/register")
+api.add_resource(LoginResource, "/login")
+
 jwt = JWTManager(app)
+
+@jwt.expired_token_loader
+def expired_token_callback(jwt_header, jwt_payload):
+    return (
+        jsonify({"message": "El token está expirado.", "error": "token_expired"}),
+        401,
+    )
+
+@jwt.invalid_token_loader
+def invalid_token_callback(error):
+    return (
+        jsonify(
+            {"message": "Token inválido", "error": "invalid_token"}
+        ),
+        401,
+    )
+
+@jwt.unauthorized_loader
+def missing_token_callback(error):
+    return (
+        jsonify(
+            {
+                "description": "Debe suministrar el access token.",
+                "error": "authorization_required",
+            }
+        ),
+        401,
+    )
 
 @app.route('/', methods=['GET'])
 def index():

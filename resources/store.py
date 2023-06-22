@@ -1,13 +1,16 @@
-from flask import request, jsonify
+from flask import request
 from flask_restful import Resource
 from models.store import StoreModel
 from db import db
 from tools.tools import Tools
+from flask_jwt_extended import jwt_required
 
 class StoreResource(Resource):
+    @jwt_required()
     def get(self, store_id):
         return Tools.abort_if_doesnt_exist(StoreModel,store_id)
     
+    @jwt_required()
     def put(self, store_id):
         if not request.get_json():
             return {"message": "No se envió la data"}, 400
@@ -23,6 +26,7 @@ class StoreResource(Resource):
         db.session.commit()
         return {"message": "Store {} actualizado satisfactoriamente".format(store.id)}, 201
     
+    @jwt_required()
     def delete(self, store_id):
         store = Tools.abort_if_doesnt_exist(StoreModel,store_id,False)
         try:
@@ -34,6 +38,7 @@ class StoreResource(Resource):
         return {"message": "Store {} eliminado satisfactoriamente".format(store_id)}, 201
 
 class StoreAllResource(Resource):
+    @jwt_required()
     def get(self):
         stores = StoreModel.query.all()
         if stores:
@@ -41,6 +46,7 @@ class StoreAllResource(Resource):
             #return {"stores": [Tools.convertir_json_sql(store) for store in store]}, 200
         return {"mensaje": "No se encontraron tiendas"}, 404
     
+    @jwt_required()
     def post(self):
         if not request.get_json():
             return {"message": "No se envió la data"}, 400

@@ -5,3 +5,4 @@ python-dotenv
 flask_restful
 pymysql
 Flask-JWT-Extended
+passlib
