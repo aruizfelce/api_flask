@@ -1,8 +1,10 @@
+import os
 from flask import Flask, jsonify
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
 from db import db
 from flask_migrate import Migrate
+from config import app_config
 import models
 from resources.store import StoreResource, StoreAllResource, StorebyNameResource
 from resources.item import ItemResource, ItemAllResource, ItemByStoreResource
@@ -10,9 +12,9 @@ from resources.user import UserResource, LoginResource, TokenRefresh
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:1213456789-pst-api@localhost:3307/flaskmysql'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config["JWT_SECRET_KEY"] = "super-secret"
+#app.config.from_object("config.DevelopmentConfig")
+enviroment = os.getenv('ENVIROMENT')
+app.config.from_object(app_config[enviroment])
 
 db.init_app(app)
 api = Api(app)
@@ -81,7 +83,7 @@ def index():
     db.create_all() """
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
 
 
 

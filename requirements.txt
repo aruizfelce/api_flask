@@ -7,3 +7,4 @@ pymysql
 Flask-JWT-Extended
 passlib
 flask-migrate
+python-dotenv
