@@ -4,7 +4,7 @@ from flask_jwt_extended import JWTManager
 from db import db
 from flask_migrate import Migrate
 import models
-from resources.store import StoreResource, StoreAllResource
+from resources.store import StoreResource, StoreAllResource, StorebyNameResource
 from resources.item import ItemResource, ItemAllResource, ItemByStoreResource
 from resources.user import UserResource, LoginResource, TokenRefresh
 
@@ -28,6 +28,8 @@ api.add_resource(ItemByStoreResource, "/items/store/<int:store_id>")
 api.add_resource(UserResource, "/users/register")
 api.add_resource(LoginResource, "/login")
 api.add_resource(TokenRefresh, "/refresh")
+
+api.add_resource(StorebyNameResource, "/stores/name/<string:name>")
 
 jwt = JWTManager(app)
 

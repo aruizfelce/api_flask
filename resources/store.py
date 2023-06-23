@@ -59,3 +59,11 @@ class StoreAllResource(Resource):
         db.session.add(new_store)
         db.session.commit()
         return {"message": "Store creada satisfactoriamente"}, 201
+    
+class StorebyNameResource(Resource):
+    # @jwt_required()
+    def get(self, name):
+        store = StoreModel.query.filter_by(name=name).first() 
+        if store:
+            return Tools.convertir_json_sql(store), 200
+        return {"mensaje": "No se encontró la tienda"}, 404
