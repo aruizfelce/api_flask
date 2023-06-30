@@ -4,11 +4,18 @@ from models.store import StoreModel
 from db import db
 from tools.tools import Tools
 from flask_jwt_extended import jwt_required
+from schemas import StoreSchema
+from marshmallow import ValidationError
 
 class StoreResource(Resource):
     @jwt_required()
     def get(self, store_id):
-        return Tools.abort_if_doesnt_exist(StoreModel,store_id)
+        stores = StoreModel.query.get(store_id)
+        if stores:
+            store_schema = StoreSchema()
+            return store_schema.dump(stores)
+        return {"message": "Tienda {} no existe".format(store_id)}, 404
+        #return Tools.abort_if_doesnt_exist(StoreModel,store_id)
     
     @jwt_required()
     def put(self, store_id):
@@ -41,14 +48,30 @@ class StoreAllResource(Resource):
     @jwt_required()
     def get(self):
         stores = StoreModel.query.all()
+        stores_schema = StoreSchema(many=True)
         if stores:
-            return [Tools.convertir_json_sql(store) for store in stores], 200
-            #return {"stores": [Tools.convertir_json_sql(store) for store in store]}, 200
-        return {"mensaje": "No se encontraron tiendas"}, 404
+            return stores_schema.dump(stores)
+       #if stores:
+        #    return [Tools.convertir_json_sql(store) for store in stores], 200
+        #return {"mensaje": "No se encontraron tiendas"}, 404 """
     
     @jwt_required()
     def post(self):
-        if not request.get_json():
+        json_data = request.get_json()
+        store_schema = StoreSchema()
+        if not json_data:
+            return {"message": "No se envió la data"}, 400
+        try:
+            data = store_schema.load(json_data)
+        except ValidationError as err:
+            return err.messages, 422
+    
+        store = StoreModel(**data)
+        db.session.add(store)
+        db.session.commit()
+        return {"message": "Store creada satisfactoriamente"}, 201
+    
+        """ if not request.get_json():
             return {"message": "No se envió la data"}, 400
         
         if not request.get_json().get("name"):
@@ -58,12 +81,15 @@ class StoreAllResource(Resource):
 
         db.session.add(new_store)
         db.session.commit()
-        return {"message": "Store creada satisfactoriamente"}, 201
+        return {"message": "Store creada satisfactoriamente"}, 201 """
     
 class StorebyNameResource(Resource):
     # @jwt_required()
     def get(self, name):
         store = StoreModel.query.filter_by(name=name).first() 
+            
         if store:
-            return Tools.convertir_json_sql(store), 200
+            store_schema = StoreSchema()
+            return store_schema.dump(store)
+            #return Tools.convertir_json_sql(store), 200
         return {"mensaje": "No se encontró la tienda"}, 404

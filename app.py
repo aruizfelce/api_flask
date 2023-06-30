@@ -9,6 +9,7 @@ import models
 from resources.store import StoreResource, StoreAllResource, StorebyNameResource
 from resources.item import ItemResource, ItemAllResource, ItemByStoreResource
 from resources.user import UserResource, LoginResource, TokenRefresh
+#from flask_marshmallow import Marshmallow
 
 app = Flask(__name__)
 
@@ -19,6 +20,7 @@ app.config.from_object(app_config[enviroment])
 db.init_app(app)
 api = Api(app)
 migrate = Migrate(app, db)
+#ma = Marshmallow(app)
 
 api.add_resource(StoreAllResource, "/stores")
 api.add_resource(StoreResource, "/stores/<int:store_id>")

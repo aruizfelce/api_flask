@@ -11,4 +11,4 @@ class ItemModel(db.Model):
     store_id = db.Column(
         db.Integer, db.ForeignKey("stores.id"), unique=False, nullable=False
     )
-    store = db.relationship("StoreModel", back_populates="items")
+   # store = db.relationship("StoreModel", back_populates="items")
